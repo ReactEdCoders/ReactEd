@@ -81,8 +81,11 @@ export function activate(context: ExtensionContext) {
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
 	window.showInformationMessage(WebpackPath);
   if (pathExists(WebpackPath)) {
-    const webpack = JSON.parse(fs.readFileSync(WebpackPath, 'utf-8'));
-  	window.showInformationMessage(webpack);
+	let content = fs.readFileSync(WebpackPath, 'utf-8');
+	const reg = /(?:entry: )\[.+\]/g;
+	let out = content.match(reg);
+	console.log(out)
+  	window.showInformationMessage('Shit Dawg');
   } else {
   	window.showInformationMessage('Workspace has no Webpack');
 	}
