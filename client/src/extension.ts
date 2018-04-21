@@ -11,6 +11,7 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
 } from 'vscode-languageclient';
+import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
 // The example settings
 interface MultiRootExampleSettings {
