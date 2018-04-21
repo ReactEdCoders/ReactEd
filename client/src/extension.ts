@@ -5,8 +5,8 @@
 'use strict';
 
 import * as path from 'path';
-
-import { workspace, ExtensionContext, WorkspaceConfiguration, Disposable } from 'vscode';
+import * as fs from 'fs';
+import { window, workspace, ExtensionContext, WorkspaceConfiguration, Disposable } from 'vscode';
 import { 
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
@@ -57,6 +57,7 @@ namespace Configuration {
 		configurationListener = workspace.onDidChangeConfiguration(() => {
 			client.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
 		});
+		
 	}
 
 	export function dispose() {
@@ -68,7 +69,23 @@ namespace Configuration {
 
 
 export function activate(context: ExtensionContext) {
-
+	function pathExists(p: string): boolean {
+		try {
+			fs.accessSync(p);
+		} catch (err) {
+			return false;
+		}
+		return true;
+	}
+	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
+	window.showInformationMessage(WebpackPath);
+  if (pathExists(WebpackPath)) {
+    const webpack = JSON.parse(fs.readFileSync(WebpackPath, 'utf-8'));
+  	window.showInformationMessage(webpack);
+  } else {
+  	window.showInformationMessage('Workspace has no Webpack');
+	}
+	
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
 	// The debug options for the server
