@@ -8,7 +8,7 @@ import {
 	createConnection, TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	ProposedFeatures, InitializeParams, Proposed
 } from 'vscode-languageserver';
-
+const fs = require('fs');
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -93,27 +93,56 @@ documents.onDidChangeContent((change) => {
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
+	// Trying to dynamically make props obj
+
+	let content = fs.readFileSync('/Users/madalynbaehre/Desktop/Codesmith/ReactEd/server/src/components.json');
+	let arr = JSON.parse(content.toString());
+
 	// In this simple example we get the settings for every validate run.
 	let settings = await getDocumentSettings(textDocument.uri);
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	let text = textDocument.getText();
-	let pattern = /\<[A-Z][a-zA-Z]+/g;
-	let m: RegExpExecArray;
+	let ImPattern = /class.[A-Z].*|const.[A-Z].*|let.[A-Z].*/g;
+	let n: RegExpExecArray;
+	let o: RegExpExecArray;
 
 	let problems = 0;
 	let diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+
+	while ((n = ImPattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+		let ImPatternCheck = /[A-Z][A-Za-z]*/;
+		if (ImPatternCheck.exec(n[0])) {
+		o = ImPatternCheck.exec(n[0]);
+		let propsArr;
+		let mapped;
+		// let propsArrStr;
+
+		for (let jind = 0; jind < arr.length; jind++) {
+			let currCompArr = Object.keys(arr[jind]);
+			let currComp = currCompArr[0];
+			if (o[0] === currComp) {
+				propsArr = arr[jind][currComp];
+				mapped = propsArr.map((prop: string) => {
+					return `this.props.${prop}`;
+				}).join(', ')
+				// propsArrStr = JSON.stringify(mapped);
+
+			}
+		}
+		// console.log(propsArr);
 		problems++;
 		diagnostics.push({
 			severity: DiagnosticSeverity.Warning,
 			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
+				start: textDocument.positionAt(n.index),
+				end: textDocument.positionAt(n.index + n[0].length)
 			},
-			message: `${m[0]} is a components`,
-			source: 'ex'
+			message: `Props: ${mapped}`,
+			source: 'ReactEd'
 		});
 	}
+	}
+
 
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });

@@ -1,0 +1,6 @@
+[
+    { "App" : [] },
+    { "Calendar" : [ { "calendarStart" : 2 }, { "exerciseList" : [ "bench", "squat", "deadlift" ] } ] },
+    { "Log" : [ { "Log" : [ "bench", "squat", "deadlift" ] } ] },
+    { "Template" : [ { "exerciseList" : [ "bench", "squat", "deadlift" ] } ] }
+]

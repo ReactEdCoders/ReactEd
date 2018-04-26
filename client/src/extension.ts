@@ -11,7 +11,9 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
 } from 'vscode-languageclient';
-import { POINT_CONVERSION_COMPRESSED } from 'constants';
+const qfgets = require('qfgets');
+
+// import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
 // The example settings
 interface MultiRootExampleSettings {
@@ -69,6 +71,7 @@ namespace Configuration {
 }
 
 
+
 export function activate(context: ExtensionContext) {
 	function pathExists(p: string): boolean {
 		try {
@@ -78,14 +81,43 @@ export function activate(context: ExtensionContext) {
 		}
 		return true;
 	}
+	
+	function grepWithFs( filename: string, regexp: string ) {
+		let fp = new qfgets(filename, "r");
+		function loop() {
+			for (let i=0; i<40; i++) {
+				let line = fp.fgets();
+				if (line && line.match(regexp)) console.log(line);
+			}
+			if (!fp.feof()) setImmediate(loop);
+		}
+		loop();
+	}
+
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
 	window.showInformationMessage(WebpackPath);
-  if (pathExists(WebpackPath)) {
+  	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
-	const reg = /(?:entry: )\[.+\]/g;
-	let out = content.match(reg);
-	console.log(out)
-  	window.showInformationMessage('Shit Dawg');
+	const filepathReg = /.*path:.*'|.*path:.*"/g;
+	const filenameReg = /.*filename:.*'|.*filename:.*"/g;
+
+	let filepathLine = content.match(filepathReg);
+	let filenameLine = content.match(filenameReg);
+
+	let filesReg = /'.*'|".*"/g;
+
+	let filepath = filepathLine[0].match(filesReg);
+	let filename = filenameLine[0].match(filesReg);
+
+	let bundle = path.join(workspace.rootPath, filepath[0].slice(1, filepath[0].length-1), filename[0].slice(1, filename[0].length-1));
+
+	if (pathExists(bundle)) {
+
+	window.showInformationMessage(bundle);
+
+		grepWithFs(bundle, '_reactDom.render');
+
+	}
   } else {
   	window.showInformationMessage('Workspace has no Webpack');
 	}
