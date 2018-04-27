@@ -95,7 +95,11 @@ documents.onDidChangeContent((change) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Trying to dynamically make props obj
 
+<<<<<<< HEAD
 	let content = fs.readFileSync('/Users/ben/school/vscode/ReactEd/server/src/components.json');
+=======
+	let content = fs.readFileSync('/Users/madalynbaehre/Desktop/Codesmith/ReactEd/server/src/components.json');
+>>>>>>> 2986e1697bcc11e11d3f435898b39a10ef04e648
 	let arr = JSON.parse(content.toString());
 
 	// In this simple example we get the settings for every validate run.
