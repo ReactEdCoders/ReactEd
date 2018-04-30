@@ -1,6 +1,6 @@
 [
     { "App" : [] },
-    { "Calendar" : [ "calendarStart", "exerciseList"] },
-    { "Log" : [ "Log" ] },
-    { "Template" : [ "exerciseList" ] }
+    { "Treats" : [ "treats" ] },
+    { "TotalTreats" : [ "total" ] },
+    { "Treat" : [ "info " ] }
 ]
