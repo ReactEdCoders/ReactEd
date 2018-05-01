@@ -8,10 +8,8 @@ import {
 	createConnection, TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	ProposedFeatures, InitializeParams, Proposed
 } from 'vscode-languageserver';
-// import { Client } from '_debugger';
 const fs = require('fs');
 const qfgets = require('qfgets');
-
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -146,7 +144,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		
 	if (testExec = testReg.exec(testCont.toString())) {
 		components[testExec[0]] = true;
-		fs.writeFileSync(__dirname + '/../../server/src/test.json', components);
+		fs.writeFileSync(__dirname + '/../../server/src/test.json', JSON.stringify(components));
 	}
 
 	// fs.writeFileSync(__dirname + '/../../server/src/test.json', JSON.stringify(components));
