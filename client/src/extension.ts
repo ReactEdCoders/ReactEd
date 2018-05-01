@@ -11,7 +11,7 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
 } from 'vscode-languageclient';
-const qfgets = require('qfgets');
+// const qfgets = require('qfgets');
 
 // import { POINT_CONVERSION_COMPRESSED } from 'constants';
 
@@ -82,17 +82,21 @@ export function activate(context: ExtensionContext) {
 		return true;
 	}
 	
-	function grepWithFs( filename: string, regexp: string ) {
-		let fp = new qfgets(filename, "r");
-		function loop() {
-			for (let i=0; i<40; i++) {
-				let line = fp.fgets();
-				if (line && line.match(regexp)) console.log(line);
-			}
-			if (!fp.feof()) setImmediate(loop);
-		}
-		loop();
-	}
+	// function grepWithFs( filename: string, regexp: string ) {
+	// 	let fp = new qfgets(filename, "r");
+	// 	function loop() {
+	// 		for (let i=0; i<40; i++) {
+	// 			let line = fp.fgets();
+	// 			if (line && line.match(regexp)) console.log(line);
+	// 		}
+	// 		if (!fp.feof()) setImmediate(loop);
+	// 	}
+	// 	loop();
+	// }
+
+	// let content = fs.readFileSync(__dirname + '/../../../server/src/bundle.txt');
+	// console.log(content.toString());
+
 
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
 	window.showInformationMessage(WebpackPath);
@@ -115,7 +119,13 @@ export function activate(context: ExtensionContext) {
 
 	window.showInformationMessage(bundle);
 
-		grepWithFs(bundle, '_reactDom.render');
+	fs.writeFile(__dirname + '/../../../server/src/bundle.txt', bundle, (err) => {
+		if (err) {
+			console.log(err)
+		} else {
+			console.log('success');
+		}
+	})
 
 	}
   } else {

@@ -8,7 +8,34 @@ import {
 	createConnection, TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	ProposedFeatures, InitializeParams, Proposed
 } from 'vscode-languageserver';
+import { Client } from '_debugger';
 const fs = require('fs');
+const qfgets = require('qfgets');
+
+const winston = require('winston');
+
+const logger = winston.createLogger({
+	level: 'info',
+	format: winston.format.json(),
+	transports: [
+	  //
+	  // - Write to all logs with level `info` and below to `combined.log` 
+	  // - Write all logs error (and below) to `error.log`.
+	  //
+	  new winston.transports.File({ filename: 'error.log', level: 'error' }),
+	  new winston.transports.File({ filename: 'combined.log' })
+	]
+  });
+
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+
+  logger.log({
+	level: 'info',
+	message: 'Hello distributed log files!'
+  });
+
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 let connection = createConnection(ProposedFeatures.all);
@@ -94,8 +121,60 @@ documents.onDidChangeContent((change) => {
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Trying to dynamically make props obj
+	function grepWithFs( filename: string, regexp1: string, regexp2: RegExp, regexp3: RegExp, regexp4: RegExp ) {
+		fs.writeFileSync(__dirname + '/../../server/src/testTwo.txt', __dirname)
+		let fp = new qfgets(filename);
+		let cont = '';
+		function loop() {
+			for (let i=0; i<40; i++) {
 
-	let content = fs.readFileSync('/Users/ben/school/vscode/ReactEd/server/src/components.json');
+				let line = fp.fgets();
+				if (line) {
+				if (line.match(regexp1)) {
+					cont += line + '\n';
+				} else if (line.match(regexp2)) {
+					cont += line + '\n';
+				} else if (regexp3.exec(line)) {
+					cont += line + '\n';
+				} else if (regexp4.exec(line)) {
+					cont += line + '\n';
+				}
+			}
+		}
+			if (!fp.feof()) setImmediate(loop);
+			fs.writeFile(__dirname + '/../../server/src/comptest.txt', cont, (err: any) => {
+				if (err) {
+					console.log(err);
+				} else {
+					console.log(cont);
+				}
+			});
+		}
+		loop();
+	}
+
+	let classReg = /_createClass\([A-Z][A-Za-z]*/;
+	let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
+	let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
+	let bundleFile = fs.readFileSync(__dirname + '/../../server/src/bundle.txt');
+
+	grepWithFs(bundleFile.toString(), '_reactDom.render', classReg, propsReg, compReg);
+
+	let components: any;
+	components = {};
+	let testExec: RegExpExecArray;
+
+	let testCont = fs.readFileSync(__dirname + '/../../server/src/comptest.txt');
+	let testReg = /_[A-Z][A-Za-z]*2\.default|[A-Z][A-Za-z]*\.default/;
+		
+	if (testExec = testReg.exec(testCont.toString())) {
+		components[testExec[0]] = true;
+		fs.writeFileSync(__dirname + '/../../server/src/test.json', components);
+	}
+
+	// fs.writeFileSync(__dirname + '/../../server/src/test.json', JSON.stringify(components));
+
+	let content = fs.readFileSync(__dirname + '/../../server/src/components.json');
 	let arr = JSON.parse(content.toString());
 
 	// In this simple example we get the settings for every validate run.
