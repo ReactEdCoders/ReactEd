@@ -8,33 +8,10 @@ import {
 	createConnection, TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	ProposedFeatures, InitializeParams, Proposed
 } from 'vscode-languageserver';
-import { Client } from '_debugger';
+// import { Client } from '_debugger';
 const fs = require('fs');
 const qfgets = require('qfgets');
 
-const winston = require('winston');
-
-const logger = winston.createLogger({
-	level: 'info',
-	format: winston.format.json(),
-	transports: [
-	  //
-	  // - Write to all logs with level `info` and below to `combined.log` 
-	  // - Write all logs error (and below) to `error.log`.
-	  //
-	  new winston.transports.File({ filename: 'error.log', level: 'error' }),
-	  new winston.transports.File({ filename: 'combined.log' })
-	]
-  });
-
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-
-  logger.log({
-	level: 'info',
-	message: 'Hello distributed log files!'
-  });
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
