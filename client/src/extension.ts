@@ -82,12 +82,14 @@ export function activate(context: ExtensionContext) {
 		}
 		return true;
 	}
-	
+
 	const grepWithMe = (line: string, regex: RegExp) => {
 		let result: string;
 		let temp: string;
-		temp = regex.exec(line)[0];
-		result = temp.replace('_', '').replace('2', '').replace('(', '').replace('.default', '');
+		if (regex.exec(line)) {
+			temp = regex.exec(line)[0];
+			result = temp.replace('_', '').replace('2', '').replace('(', '').replace('.default', '');
+		}
 		return result;
 	  }
 
@@ -108,23 +110,28 @@ export function activate(context: ExtensionContext) {
 				} else if (regexp2.exec(line)) { // Get Class
 					let cleanClass = grepWithMe(line, /(?!_createClass)+\([A-Z][A-Za-z]*/);
 					if (!contObj[cleanClass]) {
-					contObj[cleanClass] = {props: [], children: []};
+					contObj[cleanClass] = {props: [], parent: null};
 					}
 					currentClass = cleanClass;
                 } else if (regexp3.exec(line)) { //  Dumb Components
-
+				let dumbComp = grepWithMe(line, /[A-Z][A-Za-z]*/);
+				if (!contObj[dumbComp]) {
+					contObj[dumbComp] = {props: [], parent: null};
+					}
+					currentClass = dumbComp;
 				} else if (regexp4.exec(line)) { // Component Creation with Props
 					let elementItem = grepWithMe(line, /(?!_react2.default.createElement)\(_[A-Z][A-Za-z]*/);
 					let elementProps = grepWithMe(line, /\{.+\}/);
 					if (!elementProps) {
-						elementProps = null;
-					}
-					if (currentClass !== '') {
-						contObj[currentClass].children = elementItem;
+						elementProps = "null";
 					}
 					if (!contObj[elementItem]) {
-						contObj[elementItem] = {props: [], children: []};
+						contObj[elementItem] = {props: [], parent: null};
 					}
+					if (currentClass !== '') {
+						contObj[elementItem].parent = currentClass;
+					}
+					elementProps = elementProps.replace('\'', '\"');
 					contObj[elementItem].props = elementProps;
                 }
 			}
@@ -136,15 +143,6 @@ export function activate(context: ExtensionContext) {
 		}
 		loop();
 	}
-
-	let classReg = /_createClass\([A-Z][A-Za-z]*/;
-		let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
-		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
-		let bundleFile = fs.readFileSync(__dirname + '/../../../server/src/bundle.txt');
-	
-		grepWithFs(bundleFile.toString(), '_reactDom.render', classReg, propsReg, compReg);
-
-	
 
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
 	window.showInformationMessage(WebpackPath);
@@ -167,19 +165,17 @@ export function activate(context: ExtensionContext) {
 
 	window.showInformationMessage(bundle);
 
-	fs.writeFile(__dirname + '/../../../server/src/bundle.txt', bundle, (err) => {
-		if (err) {
-			console.log(err)
-		} else {
-			console.log('success');
-		}
-	})
-
-	}
-  } else {
-  	window.showInformationMessage('Workspace has no Webpack');
-	}
+	let classReg = /_createClass\([A-Z][A-Za-z]*/;
+		let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
+		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
 	
+		grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
+	
+	} else {
+		window.showInformationMessage('Workspace has no Webpack');
+	  }
+	
+	}
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
 	// The debug options for the server

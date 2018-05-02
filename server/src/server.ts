@@ -97,8 +97,6 @@ documents.onDidChangeContent((change) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Trying to dynamically make props obj
 
-	// fs.writeFileSync(__dirname + '/../../server/src/test.json', JSON.stringify(components));
-
 	let content = fs.readFileSync(__dirname + '/../../server/src/components.json');
 	let arr = JSON.parse(content.toString());
 
