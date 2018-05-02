@@ -97,8 +97,9 @@ documents.onDidChangeContent((change) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Trying to dynamically make props obj
 
-	let content = fs.readFileSync(__dirname + '/../../server/src/components.json');
-	let arr = JSON.parse(content.toString());
+	let content = fs.readFileSync(__dirname + '/../../server/src/componentTree.json');
+	let tree = JSON.parse(content.toString());
+	let arr = Object.keys(tree);
 
 	// In this simple example we get the settings for every validate run.
 	let settings = await getDocumentSettings(textDocument.uri);
@@ -115,18 +116,12 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		let ImPatternCheck = /[A-Z][A-Za-z]*/;
 		if (ImPatternCheck.exec(n[0])) {
 		o = ImPatternCheck.exec(n[0]);
-		let propsArr;
-		let mapped;
+		let propsObj;
 		// let propsArrStr;
 
-		for (let jind = 0; jind < arr.length; jind++) {
-			let currCompArr = Object.keys(arr[jind]);
-			let currComp = currCompArr[0];
-			if (o[0] === currComp) {
-				propsArr = arr[jind][currComp];
-				mapped = propsArr.map((prop: string) => {
-					return `props.${prop}`;
-				}).join(', ')
+		for (let i = 0; i < arr.length; i++) {
+			if (o[0] === arr[i]) {
+				propsObj = tree[arr[i]].props;
 				// propsArrStr = JSON.stringify(mapped);
 
 			}
@@ -139,7 +134,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				start: textDocument.positionAt(n.index),
 				end: textDocument.positionAt(n.index + n[0].length)
 			},
-			message: `Props: ${mapped}`,
+			message: `Props: ${JSON.stringify(propsObj)}`,
 			source: 'ReactEd'
 		});
 	}

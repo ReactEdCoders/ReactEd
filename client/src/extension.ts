@@ -142,7 +142,7 @@ export function activate(context: ExtensionContext) {
 			}
 		
 			if (!fp.feof()) setImmediate(loop);
-			fs.writeFile(__dirname + '/../../../server/src/comptest.txt', JSON.stringify(contObj), (err: any) => {
+			fs.writeFile(__dirname + '/../../../server/src/componentTree.json', JSON.stringify(contObj), (err: any) => {
 				if (err) console.log(err);
 			});
 		}
