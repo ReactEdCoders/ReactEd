@@ -11,6 +11,7 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
 } from 'vscode-languageclient';
+const qfgets = require('qfgets');
 // const qfgets = require('qfgets');
 
 // import { POINT_CONVERSION_COMPRESSED } from 'constants';
@@ -82,21 +83,68 @@ export function activate(context: ExtensionContext) {
 		return true;
 	}
 	
-	// function grepWithFs( filename: string, regexp: string ) {
-	// 	let fp = new qfgets(filename, "r");
-	// 	function loop() {
-	// 		for (let i=0; i<40; i++) {
-	// 			let line = fp.fgets();
-	// 			if (line && line.match(regexp)) console.log(line);
-	// 		}
-	// 		if (!fp.feof()) setImmediate(loop);
-	// 	}
-	// 	loop();
-	// }
+	const grepWithMe = (line: string, regex: RegExp) => {
+		let result: string;
+		let temp: string;
+		temp = regex.exec(line)[0];
+		result = temp.replace('_', '').replace('2', '').replace('(', '').replace('.default', '');
+		return result;
+	  }
 
-	// let content = fs.readFileSync(__dirname + '/../../../server/src/bundle.txt');
-	// console.log(content.toString());
+	function grepWithFs( filename: string, regexp1: string, regexp2: RegExp, regexp3: RegExp, regexp4: RegExp ) {
+		let fp = new qfgets(filename);
+		let contObj: any;
+		contObj = {};
+		let currentClass: string = '';
+		function loop() {
+			for (let i=0; i<40; i++) {
 
+				let line = fp.fgets();
+				if (line.match(regexp1)) { // Get Root Item
+					// let rootClean: string;
+					// rootClean = grepWithMe(line, /_[A-Z][A-Za-z]*2\.default|[A-Z][A-Za-z]*\.default/);
+					// contObj[rootClean] = 'Root';
+					currentClass = '';
+				} else if (regexp2.exec(line)) { // Get Class
+					let cleanClass = grepWithMe(line, /(?!_createClass)+\([A-Z][A-Za-z]*/);
+					if (!contObj[cleanClass]) {
+					contObj[cleanClass] = {props: [], children: []};
+					}
+					currentClass = cleanClass;
+                } else if (regexp3.exec(line)) { //  Dumb Components
+
+				} else if (regexp4.exec(line)) { // Component Creation with Props
+					let elementItem = grepWithMe(line, /(?!_react2.default.createElement)\(_[A-Z][A-Za-z]*/);
+					let elementProps = grepWithMe(line, /\{.+\}/);
+					if (!elementProps) {
+						elementProps = null;
+					}
+					if (currentClass !== '') {
+						contObj[currentClass].children = elementItem;
+					}
+					if (!contObj[elementItem]) {
+						contObj[elementItem] = {props: [], children: []};
+					}
+					contObj[elementItem].props = elementProps;
+                }
+			}
+		
+			if (!fp.feof()) setImmediate(loop);
+			fs.writeFile(__dirname + '/../../../server/src/comptest.txt', JSON.stringify(contObj), (err: any) => {
+				if (err) console.log(err);
+			});
+		}
+		loop();
+	}
+
+	let classReg = /_createClass\([A-Z][A-Za-z]*/;
+		let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
+		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
+		let bundleFile = fs.readFileSync(__dirname + '/../../../server/src/bundle.txt');
+	
+		grepWithFs(bundleFile.toString(), '_reactDom.render', classReg, propsReg, compReg);
+
+	
 
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
 	window.showInformationMessage(WebpackPath);
