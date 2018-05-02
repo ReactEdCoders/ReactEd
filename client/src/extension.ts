@@ -131,9 +131,14 @@ export function activate(context: ExtensionContext) {
 					if (currentClass !== '') {
 						contObj[elementItem].parent = currentClass;
 					}
-					elementProps = elementProps.replace('\'', '\"');
-					contObj[elementItem].props = elementProps;
-                }
+					elementProps = elementProps.replace('{','').replace('}','').replace(' ', '');
+					let propArr = elementProps.split(/,|:/g);
+					let initObj: any = {};
+					for (let i = 0; i < propArr.length - 1; i += 2) {
+						initObj[propArr[i].trim()] = propArr[i+1].trim();
+					}
+					contObj[elementItem].props = initObj;
+        }
 			}
 		
 			if (!fp.feof()) setImmediate(loop);
