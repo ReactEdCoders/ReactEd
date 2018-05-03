@@ -97,6 +97,8 @@ export function activate(context: ExtensionContext) {
 		let fp = new qfgets(filename);
 		let contObj: any;
 		contObj = {};
+		let lineArr: any;
+		lineArr = [];
 		let currentClass: string = '';
 		function loop() {
 			for (let i=0; i<40; i++) {
@@ -137,8 +139,26 @@ export function activate(context: ExtensionContext) {
 					for (let i = 0; i < propArr.length - 1; i += 2) {
 						initObj[propArr[i].trim()] = propArr[i+1].trim();
 					}
+					let propKeys = Object.keys(initObj);
+					for (let i = 0; i < propKeys.length; i++) {
+						if (!initObj[propKeys[i]].includes('props') && !initObj[propKeys[i]].includes('state')) {
+							let lineArrInd = 0;
+							while(!lineArr[lineArrInd].includes('props') && !lineArr[lineArrInd].includes('state') && lineArrInd < 4) {
+								lineArrInd++;
+							}
+							if (lineArrInd < 4) {
+							let prop = grepWithMe(lineArr[lineArrInd], /props.[A-Za-z]*|state.[A-Za-z]*/);
+							let newProp = prop.slice(6, prop.length);
+							initObj[propKeys[i]] = newProp;
+							}
+						}
+					}
 					contObj[elementItem].props = initObj;
-        }
+		}
+		lineArr.unshift(line);
+		if (lineArr.length > 4) {
+			lineArr.pop();
+		}
 			}
 		
 			if (!fp.feof()) setImmediate(loop);
