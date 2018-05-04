@@ -1,7 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 'use strict';
 
 import * as path from 'path';
@@ -139,7 +135,6 @@ export function activate(context: ExtensionContext) {
 					for (let i = 0; i < propArr.length - 1; i += 2) {
 						let propsReg = /props.[A-Za-z]*|state.[A-Za-z]*/;
 						if (propsReg.exec(propArr[i+1])) {
-							console.log("I've found a match!")
 						let val = grepWithMe(propArr[i+1], /props.[A-Za-z]*|state.[A-Za-z]*/);
 						initObj[propArr[i].trim()] = val
 						} else {
@@ -147,23 +142,18 @@ export function activate(context: ExtensionContext) {
 						}
 					}
 					let propKeys = Object.keys(initObj);
-					console.log('propKeys', propKeys)
 					for (let i = 0; i < propKeys.length; i++) {
 					if (!initObj[propKeys[i]].includes('props') && !initObj[propKeys[i]].includes('state')) {
-						console.log('key', propKeys[i]);
 							let lineArrInd = 0;
 							while(!lineArr[lineArrInd].includes('props') && !lineArr[lineArrInd].includes('state') && lineArrInd < 3) {
 								lineArrInd++;
 							}
-					 		console.log('lineArrInd', lineArrInd)
 							if (lineArrInd < 3) {
 							let prop = grepWithMe(lineArr[lineArrInd], /props.[A-Za-z]*|state.[A-Za-z]*/);
 							initObj[propKeys[i]] = prop;
 							}
 						}
 					}
-					console.log('elementItem', elementItem);
-					console.log('initObj', initObj);
 					contObj[elementItem].props = initObj;
 		}
 		lineArr.unshift(line);
