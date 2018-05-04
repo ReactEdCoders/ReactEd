@@ -137,22 +137,33 @@ export function activate(context: ExtensionContext) {
 					let propArr = elementProps.split(/,|:/g);
 					let initObj: any = {};
 					for (let i = 0; i < propArr.length - 1; i += 2) {
+						let propsReg = /props.[A-Za-z]*|state.[A-Za-z]*/;
+						if (propsReg.exec(propArr[i+1])) {
+							console.log("I've found a match!")
+						let val = grepWithMe(propArr[i+1], /props.[A-Za-z]*|state.[A-Za-z]*/);
+						initObj[propArr[i].trim()] = val
+						} else {
 						initObj[propArr[i].trim()] = propArr[i+1].trim();
+						}
 					}
 					let propKeys = Object.keys(initObj);
+					console.log('propKeys', propKeys)
 					for (let i = 0; i < propKeys.length; i++) {
-						if (!initObj[propKeys[i]].includes('props') && !initObj[propKeys[i]].includes('state')) {
+					if (!initObj[propKeys[i]].includes('props') && !initObj[propKeys[i]].includes('state')) {
+						console.log('key', propKeys[i]);
 							let lineArrInd = 0;
-							while(!lineArr[lineArrInd].includes('props') && !lineArr[lineArrInd].includes('state') && lineArrInd < 4) {
+							while(!lineArr[lineArrInd].includes('props') && !lineArr[lineArrInd].includes('state') && lineArrInd < 3) {
 								lineArrInd++;
 							}
-							if (lineArrInd < 4) {
+					 		console.log('lineArrInd', lineArrInd)
+							if (lineArrInd < 3) {
 							let prop = grepWithMe(lineArr[lineArrInd], /props.[A-Za-z]*|state.[A-Za-z]*/);
-							let newProp = prop.slice(6, prop.length);
-							initObj[propKeys[i]] = newProp;
+							initObj[propKeys[i]] = prop;
 							}
 						}
 					}
+					console.log('elementItem', elementItem);
+					console.log('initObj', initObj);
 					contObj[elementItem].props = initObj;
 		}
 		lineArr.unshift(line);
