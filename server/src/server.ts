@@ -97,6 +97,49 @@ documents.onDidChangeContent((change) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Trying to dynamically make props obj
 
+	function traceProp(comp: string, prop: string, obj: any): boolean {
+		let props = obj[comp].props;
+	  
+		let parent = obj[comp].parent;
+		if (props[prop] && props[prop].includes('state')) {
+			return true;
+		} else {
+		  if (parent) {
+			let newProp = props[prop].substr(6, props[prop].length - 6);
+			return traceProp(parent, newProp, obj)
+		  } else {
+			return false;
+		  }
+		}
+	  }
+
+	  function recurseItUp(comp: string, obj: any): any {
+		let propArr = [];
+		
+		let props = obj[comp].props;
+		
+		let parent = obj[comp].parent;
+		
+		for (let key in props) {
+		  if (props[key].includes('state')) {
+			propArr.push(key);
+		  } else {
+			
+			if (parent) {
+			  let prop = props[key].substr(6, props[key].length - 6);
+			  let push = traceProp(parent, prop, obj);
+			  if (push) {
+				propArr.push(key);
+			  }
+			}
+		  }
+		} 
+		return propArr;
+	  
+	  }
+	  
+
+
 	let content = fs.readFileSync(__dirname + '/../../server/src/componentTree.json');
 	let tree = JSON.parse(content.toString());
 	let arr = Object.keys(tree);
@@ -121,9 +164,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 		for (let i = 0; i < arr.length; i++) {
 			if (o[0] === arr[i]) {
-				propsObj = tree[arr[i]].props;
-				// propsArrStr = JSON.stringify(mapped);
-
+				propsObj = recurseItUp(o[0], tree);
 			}
 		}
 		// console.log(propsArr);
