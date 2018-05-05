@@ -53,6 +53,7 @@ namespace Configuration {
 			client.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
 		});
 		
+		
 	}
 
 	export function dispose() {
@@ -98,6 +99,19 @@ export function activate(context: ExtensionContext) {
 		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
 		let traverse = new traverseWebpack();
 		traverse.grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
+		let debounce = false;
+			fs.watch(bundle, { encoding: 'buffer' }, (event, filename) => {
+				if(event === 'change' && !debounce && filename) {
+					console.log('I ran');
+					debounce = true;
+					setTimeout(() => {
+						debounce = false;
+					}, 5000)
+					traverse.grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
+				}
+			});
+		
+		
 	} else {
 		window.showInformationMessage('Workspace has no Webpack');
 	  }
