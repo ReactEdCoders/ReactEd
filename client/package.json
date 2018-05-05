@@ -25,13 +25,13 @@
 			"type": "object",
 			"title": "Example configuration",
 			"properties": {
-				"lspMultiRootSample.maxNumberOfProblems": {
+				"ReactEd.maxNumberOfProblems": {
 					"scope": "resource",
 					"type": "number",
 					"default": 100,
 					"description": "Controls the maximum number of problems produced by the server."
 				},
-				"lspMultiRootSample.trace.server": {
+				"ReactEd.trace.server": {
 					"scope": "window",
 					"type": "string",
 					"enum": [
