@@ -8,8 +8,8 @@ import {
 	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
 	DidChangeConfigurationNotification, Proposed, ProposedFeatures
 } from 'vscode-languageclient';
-interface MultiRootExampleSettings {
-	maxNumberOfProblems: number;
+interface ReactEdSettings {
+	maxNumberOfProblems: number; 
 }
 
 let client: LanguageClient;
@@ -24,7 +24,7 @@ namespace Configuration {
 		if (!params.items) {
 			return null;
 		}
-		let result: (MultiRootExampleSettings | null)[] = [];
+		let result: (ReactEdSettings | null)[] = [];
 		for (let item of params.items) {
 			// The server asks the client for configuration settings without a section
 			// If a section is present we return null to indicate that the configuration
@@ -75,16 +75,17 @@ export function activate(context: ExtensionContext) {
 		return true;
 	}
 
-	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
-	window.showInformationMessage(WebpackPath);
+	/**** Parsing through the webpack config file for bundle location ****/  
+	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js'); // Accessing the webpack file
   	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
-	const filepathReg = /.*path:.*'|.*path:.*"/g;
-	const filenameReg = /.*filename:.*'|.*filename:.*"/g;
+	const filepathReg = /.*path:.*'|.*path:.*"/g; //Regex for the file path
+	const filenameReg = /.*filename:.*'|.*filename:.*"/g; // Regex for the file name
 
-	let filepathLine = content.match(filepathReg);
-	let filenameLine = content.match(filenameReg);
+	let filepathLine = content.match(filepathReg); // looking for the file path
+	let filenameLine = content.match(filenameReg); //looking for the file name
 
+	
 	let filesReg = /'.*'|".*"/g;
 
 	let filepath = filepathLine[0].match(filesReg);
@@ -92,22 +93,19 @@ export function activate(context: ExtensionContext) {
 
 	let bundle = path.join(workspace.rootPath, filepath[0].slice(1, filepath[0].length-1), filename[0].slice(1, filename[0].length-1));
 
+	/****if found bundle then traversing the bundle file ****/
 	if (pathExists(bundle)) {
 		window.showInformationMessage(bundle);
-		let classReg = /_createClass\([A-Z][A-Za-z]*/;
-		let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
-		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
-		let traverse = new traverseWebpack();
-		traverse.grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
-		let debounce = false;
+		let traverse = new traverseWebpack(); //Bringing in functionality for parsing the bundle file 
+		traverse.grepWithFs(bundle);
+		let debounce = false; 
 			fs.watch(bundle, { encoding: 'buffer' }, (event, filename) => {
 				if(event === 'change' && !debounce && filename) {
-					console.log('I ran');
 					debounce = true;
 					setTimeout(() => {
 						debounce = false;
 					}, 5000)
-					traverse.grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
+					traverse.grepWithFs(bundle);
 				}
 			});
 		
@@ -137,21 +135,17 @@ export function activate(context: ExtensionContext) {
 
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
+		// Register the server for javascript and JSX files
 		documentSelector: [{scheme: 'file', language: 'javascript'},{scheme: 'file', language: 'javascriptreact'}],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contain in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc'),
-			// In the past this told the client to actively synchronize settings. Since the
-			// client now supports 'getConfiguration' requests this active synchronization is not
-			// necessary anymore. 
-			// configurationSection: [ 'lspMultiRootSample' ]
+			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		},
 		middleware: middleware as Middleware
 	}
 	
 	// Create the language client and start the client.
-	client = new LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
+	client = new LanguageClient('languageServer', 'Language Server for React Component files', serverOptions, clientOptions);
 	// Register new proposed protocol if available.
 	client.registerProposedFeatures();
 	client.onReady().then(() => {
