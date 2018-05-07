@@ -1,0 +1,59 @@
+{
+  "React import" : {
+    "prefix" : "ireact",
+    "body" : [
+      "import React, { Component } from 'react'\n\nclass ${1:Reactools} extends Component {\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n\nexport default ${1:Reactools};"
+    ],
+    "description" : "tabs out the skeleton of a react component"
+		}, 
+		"Class import" : {
+			"prefix": "cocomp",
+			"body": "class ${1:componentName} extends Component {\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
+			"description": "creates only the class component" 
+		}, 
+		"Class with will mount": {
+			"prefix": "cwmount",
+			"body": "class ${1:componentName} extends Component {\n\n\tcomponentWillMount () {\n\n\t}\n\n\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
+			"description": "provides a class componenet with the willMount cycle"
+		}, 
+		"Class with Did mount": {
+			"prefix": "cdmount",
+			"body": "class ${1:componentName} extends Component {\n\n\tcomponentDidlMount () {\n\n\t}\n\n\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
+			"description": "provides a class componenet with the didMount cycle"
+		}, 
+		"Class Constructor" : {
+			"prefix": "ccon",
+			"body": "class ${1:componentName} extends Component{\n\tconstructor(props) {\n\t\tsuper(props);\n\t\tconsole.log('')\n\t}\n\n\trender() {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
+			"description": "creates a class component with the contructor inside"
+		}, 
+		"General Import" : {
+			"prefix": "impf", 
+			"body": "import $1 from '$2';",
+			"description": "General import statment"
+		}, 
+		"This state Props" : {
+			"prefix": "tsp", 
+			"body": "this.state.props", 
+			"description": "this.state.props"
+		}, 
+		"import Redux" : {
+			"prefix": "ired",
+			"body": "import { createStore } from 'redux' ",
+			"description": "imports a redux store"
+		},
+		"Reducer" : {
+			"prefix": "reducer", 
+			"body": "const reducer = (state, action) => {\n\n //makes changes to the state based on the action\n\n}",
+			"description": "creates a reducer function"
+		}, 
+		"Creates Redux store": {
+			"prefix": "rstore", 
+			"body": "const store = createStore(reducer, $1)",
+			"description": "redux store"
+		},
+		"store subscriber" : {
+			"prefix": "scribe",
+			"body": "store.subscribe(() => {\n\t\nconsole.log()\n\n})",
+			"description": "subscribe method"
+		}
+  }

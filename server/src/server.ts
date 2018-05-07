@@ -186,8 +186,8 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
       diagnostics.push({
         severity: DiagnosticSeverity.Warning,
         range: {
-          start: textDocument.positionAt(n.index),
-          end: textDocument.positionAt(n.index + n[0].length)
+          start: textDocument.positionAt(n.index + o.index),
+          end: textDocument.positionAt(n.index + o[0].length + o.index)
 				},
 				//TODO create wording when prop is not passed correctly/completely
         message: `Props: ${JSON.stringify(propsObj)}`,
