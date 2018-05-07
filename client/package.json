@@ -1,19 +1,20 @@
 {
-	"name": "lsp-mulit-root-sample-client-part",
-	"description": "VSCode part of a language server",
-	"author": "Microsoft Corporation",
+	"name": "ReactEd",
+	"description": "Tools to enhance react development",
+	"author": "Maddie, Ben, Jacob, Paul",
 	"license": "MIT",
 	"version": "0.0.1",
 	"publisher": "vscode",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/ReactEdLLC/ReactEd"
 	},
 	"engines": {
-		"vscode": "^1.16.0"
+		"vscode": "^1.23.0"
 	},
 	"categories": [
-		"Other"
+		"Snippets",
+		"Language Packs"
 	],
 	"activationEvents": [
 		"onLanguage:javascriptreact",
@@ -23,7 +24,7 @@
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "Example configuration",
+			"title": "Server configuration",
 			"properties": {
 				"ReactEd.maxNumberOfProblems": {
 					"scope": "resource",
@@ -43,7 +44,13 @@
 					"description": "Traces the communication between VSCode and the language server."
 				}
 			}
-		}
+		},
+		"snippets": [
+    	{
+        "language": "javascriptreact",
+        "path": "./snippets/snippets.json"
+      }
+    ]
 	},
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",
