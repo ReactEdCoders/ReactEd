@@ -180,7 +180,11 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
       let propsObj;
 
       propsObj = recurseItUp(o[0], tree);
-
+			let messageStr: string = '';
+			if (propsObj.state.length > 0) messageStr += `Passed from state: ${JSON.stringify(propsObj.state)}`;
+			if(messageStr != '') messageStr += '\n';
+			if (propsObj.parent.length > 0) messageStr += `Passed from parent: ${JSON.stringify(propsObj.parent)}`;
+			if(messageStr === '') messageStr += 'No Props passed';
 			problems++;
 			//generate diagnostic object with prop information/relationships
       diagnostics.push({
@@ -189,9 +193,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
           start: textDocument.positionAt(n.index + o.index),
           end: textDocument.positionAt(n.index + o[0].length + o.index)
 				},
-				//TODO create wording when prop is not passed correctly/completely
-        message: `Passed from state: ${JSON.stringify(propsObj.state)} 
-                  Passed from parent: ${JSON.stringify(propsObj.parent)}`,
+        message: messageStr,
         source: "ReactEd"
       });
     }

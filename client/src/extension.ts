@@ -1,5 +1,4 @@
 'use strict';
-
 import * as path from 'path';
 import * as fs from 'fs';
 import traverseWebpack from './traverseWebpack';
@@ -17,7 +16,6 @@ let client: LanguageClient;
 namespace Configuration {
 
 	let configurationListener: Disposable;
-
 	// Convert VS Code specific settings to a format acceptable by the server. Since
 	// both client and server do use JSON the conversion is trivial. 
 	export function computeConfiguration(params: Proposed.ConfigurationParams, _token: CancellationToken, _next: Function): any[] {
@@ -51,20 +49,14 @@ namespace Configuration {
 		// listen to any change. However this will change in the near future.
 		configurationListener = workspace.onDidChangeConfiguration(() => {
 			client.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
-		});
-		
-		
+		});	
 	}
-
 	export function dispose() {
 		if (configurationListener) {
 			configurationListener.dispose();
 		}
 	}
 }
-
-
-
 export function activate(context: ExtensionContext) {
 	function pathExists(p: string): boolean {
 		try {
@@ -74,28 +66,21 @@ export function activate(context: ExtensionContext) {
 		}
 		return true;
 	}
-
 	/**** Parsing through the webpack config file for bundle location ****/  
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js'); // Accessing the webpack file
   	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
 	const filepathReg = /.*path:.*'|.*path:.*"/g; //Regex for the file path
 	const filenameReg = /.*filename:.*'|.*filename:.*"/g; // Regex for the file name
-
 	let filepathLine = content.match(filepathReg); // looking for the file path
 	let filenameLine = content.match(filenameReg); //looking for the file name
-
-	
 	let filesReg = /'.*'|".*"/g;
-
 	let filepath = filepathLine[0].match(filesReg);
 	let filename = filenameLine[0].match(filesReg);
-
 	let bundle = path.join(workspace.rootPath, filepath[0].slice(1, filepath[0].length-1), filename[0].slice(1, filename[0].length-1));
-
 	/****if found bundle then traversing the bundle file ****/
 	if (pathExists(bundle)) {
-		window.showInformationMessage(bundle);
+		window.showInformationMessage('Bundle Found..Starting Parse');
 		let traverse = new traverseWebpack(); //Bringing in functionality for parsing the bundle file 
 		traverse.grepWithFs(bundle);
 		let debounce = false; 
@@ -107,13 +92,10 @@ export function activate(context: ExtensionContext) {
 					}, 5000)
 					traverse.grepWithFs(bundle);
 				}
-			});
-		
-		
+			});	
 	} else {
-		window.showInformationMessage('Workspace has no Webpack');
+		window.showInformationMessage('Unable to find webpack bundle');
 	  }
-	
 	}
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
@@ -126,13 +108,11 @@ export function activate(context: ExtensionContext) {
 		run : { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
-
 	let middleware: ProposedFeatures.ConfigurationMiddleware | Middleware = {
 		workspace: {
 			configuration: Configuration.computeConfiguration
 		}
 	};
-
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for javascript and JSX files
@@ -143,7 +123,6 @@ export function activate(context: ExtensionContext) {
 		},
 		middleware: middleware as Middleware
 	}
-	
 	// Create the language client and start the client.
 	client = new LanguageClient('languageServer', 'Language Server for React Component files', serverOptions, clientOptions);
 	// Register new proposed protocol if available.
@@ -155,7 +134,6 @@ export function activate(context: ExtensionContext) {
 	// Start the client. This will also launch the server
 	client.start();
 }
-
 export function deactivate(): Thenable<void> {
 	if (!client) {
 		return undefined;
