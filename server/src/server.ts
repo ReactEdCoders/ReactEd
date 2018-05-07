@@ -127,7 +127,9 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   }
   //returns props passed from state to component
   function recurseItUp(comp: string, obj: any): any {
-    let propArr = [];
+    let propObj: any = {};
+    propObj.state = [];
+    propObj.parent = [];
 
     let props = obj[comp].props;
 
@@ -135,18 +137,20 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
     for (let key in props) {
       if (props[key].includes("state")) {
-        propArr.push(key);
+        propObj.state.push(key);
       } else {
         if (parent) {
           let prop = props[key].substr(6, props[key].length - 6);
           let push = traceProp(parent, prop, obj);
           if (push) {
-            propArr.push(key);
+            propObj.state.push(key);
+          } else {
+            propObj.parent.push(key);
           }
         }
       }
     }
-    return propArr;
+    return propObj;
 	}
 	
 	//parses through component tree file to create component/props obj & component array
@@ -154,7 +158,6 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
     __dirname + "/../../server/src/componentTree.json"
   );
   let tree = JSON.parse(content.toString());
-  let componentArray = Object.keys(tree);
 
   // In this simple example we get the settings for every validate run.
   let settings = await getDocumentSettings(textDocument.uri);
@@ -175,12 +178,9 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
     if (ImPatternCheck.exec(n[0])) {
       o = ImPatternCheck.exec(n[0]);
       let propsObj;
-			// TODO look up component array using keys 
-      for (let i = 0; i < componentArray.length; i++) {
-        if (o[0] === componentArray[i]) {
-          propsObj = recurseItUp(o[0], tree);
-        }
-      }
+
+      propsObj = recurseItUp(o[0], tree);
+
 			problems++;
 			//generate diagnostic object with prop information/relationships
       diagnostics.push({
@@ -190,7 +190,8 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
           end: textDocument.positionAt(n.index + o[0].length + o.index)
 				},
 				//TODO create wording when prop is not passed correctly/completely
-        message: `Props: ${JSON.stringify(propsObj)}`,
+        message: `Passed from state: ${JSON.stringify(propsObj.state)} 
+                  Passed from parent: ${JSON.stringify(propsObj.parent)}`,
         source: "ReactEd"
       });
     }
