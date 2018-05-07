@@ -21,7 +21,7 @@ export default class TraverseWebpack {
     const regexp1 = "_reactDom.render";
     const regexp2 = /_createClass\([A-Z][A-Za-z]*/;
     const regexp3 = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
-    const regexp4 = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
+    const regexp4 = /_react2.default.createElement\(_[A-Z][A-Za-z]*|_react2.default.createElement\([A-Z][A-Za-z]*/;
     let fp = new qfgets(filename);
     const contObj: any = {};
     const lineArr: any = [];
@@ -53,7 +53,7 @@ export default class TraverseWebpack {
           // Component creation with props and assigns to component
           let elementItem = regWithMe(
             line,
-            /(?!_react2.default.createElement)\(_[A-Z][A-Za-z]*/
+            /(?!_react2.default.createElement)\(_[A-Z][A-Za-z]*|(?!_react2.default.createElement)\([A-Z][A-Za-z]*/
           );
           let elementProps = regWithMe(line, /\{.+\}/);
           if (!elementProps) {
