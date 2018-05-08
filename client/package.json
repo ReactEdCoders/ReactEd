@@ -1,8 +1,9 @@
 {
-	"name": "ReactEd",
+	"name": "reacted",
 	"description": "Tools to enhance react development",
 	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
 	"license": "MIT",
+	"displayName": "ReactEd",
 	"version": "0.0.1",
 	"publisher": "vscode",
 	"repository": {
@@ -10,11 +11,11 @@
 		"url": "https://github.com/ReactEdLLC/ReactEd"
 	},
 	"engines": {
-		"vscode": "^1.23.0"
+		"vscode": "^1.1.5"
 	},
 	"categories": [
 		"Snippets",
-		"Language Packs"
+		"Other"
 	],
 	"activationEvents": [
 		"onLanguage:javascriptreact",
@@ -46,11 +47,11 @@
 			}
 		},
 		"snippets": [
-    	{
-        "language": "javascriptreact",
-        "path": "./snippets/snippets.json"
-      }
-    ]
+			{
+				"language": "javascriptreact",
+				"path": "./snippets/snippets.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "tsc -p ./",

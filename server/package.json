@@ -1,11 +1,11 @@
 {
-	"name": "ReactEd",
+	"name": "reacted",
 	"description": "Tools to enhance react development",
 	"version": "0.0.1",
 	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
 	"license": "MIT",
 	"engines": {
-		"node": "*"
+		"vscode": "^1.15"
 	},
 	"repository": {
 		"type": "git",
@@ -16,6 +16,7 @@
 		"vscode-languageserver": "^3.5.0"
 	},
 	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
 		"installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",
 		"compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
 		"watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -w -p ."

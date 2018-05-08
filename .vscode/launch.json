@@ -2,7 +2,6 @@
 	"version": "0.2.0",
 	// List of configurations. Add new configurations or edit existing ones.
 	"configurations": [
-		
 		{
 			"name": "Launch Client",
 			"type": "extensionHost",
@@ -22,18 +21,6 @@
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/client/server/**/*.js" ],
 			"preLaunchTask": "watch:server"
-		},
-		{
-			"name": "Attach to TS Server",
-			"type": "node",
-			"request": "launch",
-			"protocol": "inspector",
-			"port": 5859,
-			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/client/server/**/*.js" ],
-			"runtimeArgs": [
-					"--inspect=5859"
-			]
-	}
+		}
 	]
 }

@@ -58,6 +58,7 @@ namespace Configuration {
 	}
 }
 export function activate(context: ExtensionContext) {
+	window.showInformationMessage('Started ReactEd');
 	function pathExists(p: string): boolean {
 		try {
 			fs.accessSync(p);
