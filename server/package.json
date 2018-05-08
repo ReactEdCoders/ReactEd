@@ -2,7 +2,7 @@
 	"name": "ReactEd",
 	"description": "Tools to enhance react development",
 	"version": "0.0.1",
-	"author": "Jake, Maddie, Paul, Ben",
+	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
 	"license": "MIT",
 	"engines": {
 		"node": "*"

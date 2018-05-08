@@ -114,7 +114,6 @@ export default class TraverseWebpack {
           lineArr.pop();
         }
       }
-
       if (!fp.feof()) setImmediate(loop);
       /* Generate Component Tree file */
       fs.writeFile(
