@@ -5,14 +5,8 @@
 "use strict";
 
 import {
-  createConnection,
-  TextDocuments,
-  TextDocument,
-  Diagnostic,
-  DiagnosticSeverity,
-  ProposedFeatures,
-  InitializeParams,
-  Proposed
+  createConnection, TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
+  ProposedFeatures, InitializeParams, DidChangeConfigurationNotification
 } from "vscode-languageserver";
 const fs = require("fs");
 
@@ -33,14 +27,8 @@ connection.onInitialize((params: InitializeParams) => {
 
   // Does the client support the `workspace/configuration` request?
   // If not, we will fall back using global settings
-  hasWorkspaceFolderCapability =
-    (capabilities as Proposed.WorkspaceFoldersClientCapabilities).workspace &&
-    !!(capabilities as Proposed.WorkspaceFoldersClientCapabilities).workspace
-      .workspaceFolders;
-  hasConfigurationCapability =
-    (capabilities as Proposed.ConfigurationClientCapabilities).workspace &&
-    !!(capabilities as Proposed.ConfigurationClientCapabilities).workspace
-      .configuration;
+  hasConfigurationCapability = capabilities.workspace && !!capabilities.workspace.configuration;
+  hasWorkspaceFolderCapability = capabilities.workspace && !!capabilities.workspace.workspaceFolders;
 
   return {
     capabilities: {
@@ -50,9 +38,12 @@ connection.onInitialize((params: InitializeParams) => {
 });
 
 connection.onInitialized(() => {
+  if (hasConfigurationCapability) {
+    connection.client.register(DidChangeConfigurationNotification.type, undefined);
+  }
   if (hasWorkspaceFolderCapability) {
-    connection.workspace.onDidChangeWorkspaceFolders(_event => {
-      connection.console.log("Workspace folder change event received");
+    connection.workspace.onDidChangeWorkspaceFolders((_event) => {
+      connection.console.log('Workspace folder change event received.');
     });
   }
 });
@@ -76,7 +67,7 @@ connection.onDidChangeConfiguration(change => {
     // Reset all cached document settings
     documentSettings.clear();
   } else {
-    globalSettings = <ReactEdSettings>(change.settings.lspMultiRootSample ||
+    globalSettings = <ReactEdSettings>(change.settings.reacted ||
       defaultSettings);
   }
 
@@ -151,11 +142,12 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
       }
     }
     return propObj;
-	}
-	
-	//parses through component tree file to create component/props obj & component array
+  }
+
+  //parses through component tree file to create component/props obj & component array
+
   let content = fs.readFileSync(
-    __dirname + "/../../server/src/componentTree.json"
+    __dirname + "/componentTree.json"
   );
   let tree = JSON.parse(content.toString());
 
@@ -169,7 +161,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
   let problems = 0;
   let diagnostics: Diagnostic[] = [];
-	//iterates through text documents open in VSCode looking for instances of regex matches; assigns as problem to underline and show props
+  //iterates through text documents open in VSCode looking for instances of regex matches; assigns as problem to underline and show props
   while (
     (n = ImPattern.exec(text)) &&
     problems < settings.maxNumberOfProblems
@@ -180,19 +172,19 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
       let propsObj;
 
       propsObj = recurseItUp(o[0], tree);
-			let messageStr: string = '';
-			if (propsObj.state.length > 0) messageStr += `Passed from state: ${JSON.stringify(propsObj.state)}`;
-			if(messageStr != '') messageStr += '\n';
-			if (propsObj.parent.length > 0) messageStr += `Passed from parent: ${JSON.stringify(propsObj.parent)}`;
-			if(messageStr === '') messageStr += 'No Props passed';
-			problems++;
-			//generate diagnostic object with prop information/relationships
+      let messageStr: string = '';
+      if (propsObj.state.length > 0) messageStr += `Passed from state: ${JSON.stringify(propsObj.state)}`;
+      if (messageStr != '') messageStr += '\n';
+      if (propsObj.parent.length > 0) messageStr += `Passed from parent: ${JSON.stringify(propsObj.parent)}`;
+      if (messageStr === '') messageStr += 'No Props passed';
+      problems++;
+      //generate diagnostic object with prop information/relationships
       diagnostics.push({
         severity: DiagnosticSeverity.Warning,
         range: {
           start: textDocument.positionAt(n.index + o.index),
           end: textDocument.positionAt(n.index + o[0].length + o.index)
-				},
+        },
         message: messageStr,
         source: "ReactEd"
       });

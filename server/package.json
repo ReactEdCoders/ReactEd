@@ -1,8 +1,8 @@
 {
-	"name": "ReactEd",
+	"name": "reacted",
 	"description": "Tools to enhance react development",
 	"version": "0.0.1",
-	"author": "Jake, Maddie, Paul, Ben",
+	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
 	"license": "MIT",
 	"engines": {
 		"node": "*"
@@ -12,8 +12,7 @@
 		"url": "https://github.com/ReactEdLLC/ReactEd"
 	},
 	"dependencies": {
-		"qfgets": "^1.1.1",
-		"vscode-languageserver": "^3.5.0"
+		"vscode-languageserver": "^4.1.2"
 	},
 	"scripts": {
 		"installServer": "installServerIntoExtension ../client ./package.json ./tsconfig.json",

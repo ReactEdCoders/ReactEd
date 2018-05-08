@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import traverseWebpack from './traverseWebpack';
 import { window, workspace, ExtensionContext, WorkspaceConfiguration, Disposable } from 'vscode';
 import { 
-	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
-	DidChangeConfigurationNotification, Proposed, ProposedFeatures
+	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware,
+	DidChangeConfigurationNotification, ConfigurationParams
 } from 'vscode-languageclient';
 interface ReactEdSettings {
 	maxNumberOfProblems: number; 
@@ -18,7 +18,7 @@ namespace Configuration {
 	let configurationListener: Disposable;
 	// Convert VS Code specific settings to a format acceptable by the server. Since
 	// both client and server do use JSON the conversion is trivial. 
-	export function computeConfiguration(params: Proposed.ConfigurationParams, _token: CancellationToken, _next: Function): any[] {
+	export function computeConfiguration(params: ConfigurationParams, _token: CancellationToken, _next: Function): any[] {
 		if (!params.items) {
 			return null;
 		}
@@ -33,9 +33,9 @@ namespace Configuration {
 			}
 			let config: WorkspaceConfiguration;
 			if (item.scopeUri) {
-				config = workspace.getConfiguration('ReactEd', client.protocol2CodeConverter.asUri(item.scopeUri));
+				config = workspace.getConfiguration('reacted', client.protocol2CodeConverter.asUri(item.scopeUri));
 			} else {
-				config = workspace.getConfiguration('ReactEd');
+				config = workspace.getConfiguration('reacted');
 			}
 			result.push({
 				maxNumberOfProblems: config.get('maxNumberOfProblems')
@@ -58,6 +58,7 @@ namespace Configuration {
 	}
 }
 export function activate(context: ExtensionContext) {
+	window.showInformationMessage('Started ReactEd');
 	function pathExists(p: string): boolean {
 		try {
 			fs.accessSync(p);
@@ -68,7 +69,8 @@ export function activate(context: ExtensionContext) {
 	}
 	/**** Parsing through the webpack config file for bundle location ****/  
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js'); // Accessing the webpack file
-  	if (pathExists(WebpackPath)) {
+	window.showInformationMessage(WebpackPath);	
+	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
 	const filepathReg = /.*path:.*'|.*path:.*"/g; //Regex for the file path
 	const filenameReg = /.*filename:.*'|.*filename:.*"/g; // Regex for the file name
@@ -100,7 +102,7 @@ export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
 	// The debug options for the server
-	let debugOptions = { execArgv: ["--debug=5859"] };
+	let debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 	
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -108,7 +110,7 @@ export function activate(context: ExtensionContext) {
 		run : { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
-	let middleware: ProposedFeatures.ConfigurationMiddleware | Middleware = {
+	let middleware: Middleware = {
 		workspace: {
 			configuration: Configuration.computeConfiguration
 		}
@@ -121,15 +123,10 @@ export function activate(context: ExtensionContext) {
 			// Notify the server about file changes to '.clientrc files contain in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		},
-		middleware: middleware as Middleware
+		middleware: middleware
 	}
 	// Create the language client and start the client.
-	client = new LanguageClient('languageServer', 'Language Server for React Component files', serverOptions, clientOptions);
-	// Register new proposed protocol if available.
-	client.registerProposedFeatures();
-	client.onReady().then(() => {
-		Configuration.initialize();
-	});
+	client = new LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
 	
 	// Start the client. This will also launch the server
 	client.start();

@@ -114,11 +114,10 @@ export default class TraverseWebpack {
           lineArr.pop();
         }
       }
-
       if (!fp.feof()) setImmediate(loop);
       /* Generate Component Tree file */
       fs.writeFile(
-        __dirname + "/../../../server/src/componentTree.json",
+        __dirname + "/../../server/componentTree.json",
         JSON.stringify(contObj),
         (err: any) => {
           if (err) console.log(err);

@@ -1,4 +1,5 @@
 out
 node_modules
 client/server
-server/src/componentTree.json
+reacted-0.0.1.vsix
+.DS_Store
