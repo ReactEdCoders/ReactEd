@@ -1,5 +1,5 @@
 const qfgets = require("qfgets");
-import * as fs from "fs";
+// import * as fs from "fs";
 /* cleans grepped lines by applying regex */
 function regWithMe(line: string, regex: RegExp): string {
   let result: string;
@@ -116,13 +116,13 @@ export default class TraverseWebpack {
       }
       if (!fp.feof()) setImmediate(loop);
       /* Generate Component Tree file */
-      fs.writeFile(
-        __dirname + "/componentTree.json",
-        JSON.stringify(contObj),
-        (err: any) => {
-          if (err) console.log(err);
-        }
-      );
+      // fs.writeFile(
+      //   __dirname + "/componentTree.json",
+      //   JSON.stringify(contObj),
+      //   (err: any) => {
+      //     if (err) console.log(err);
+      //   }
+      // );
     }
     loop();
   }
