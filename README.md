@@ -24,6 +24,7 @@ ReactEd requires a webpack generated bundle file to properly traverse your appli
       publicPath: '/dist',
     },
     mode: 'none',
+  }
 }
 ```
 **Note:** If using Webpack 4.0 or greater please change your [**mode**](https://webpack.js.org/concepts/#mode) to **none** as the default is **Production** which will minify the bundle and make our tool stop working.
