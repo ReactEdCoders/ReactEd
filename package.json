@@ -6,8 +6,8 @@
 	"version": "0.0.1",
 	"publisher": "vscode",
 	"engines": {
-		"vscode": "^1.0.0"
-},
+		"vscode": "^1.1.5"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ReactEdLLC/ReactEd"
