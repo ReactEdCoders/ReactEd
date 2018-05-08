@@ -14,7 +14,7 @@ Exposing the props passed down from the react parent components.
 ## Configuration
 
 ReactEd requires a webpack generated bundle file to properly traverse your application.  At this time we are unable to offer support for Create-React-App.  
-```json
+```javascript
 {
   module.exports = {
     entry: './src/index.js',
