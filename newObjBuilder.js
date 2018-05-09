@@ -1,10 +1,15 @@
-//var extendMe = '|A*5'             //returns --> { state: [ null, null, null ] }
+//var extendMe = '|A*9'             //returns --> { state: [ lorem, ipsum, vera ] }; array with n values
 //var extendMe = '|Agoldenretriever,poodle,chihuahua,maltese,shiba,pomeranian^' //returns --> { state: [ 'hour', 'day', 'week' ] }
+var extendMe = '|A3' //--> { state: [[lorem], [ipsum], [vera]] }
 //var extendMe = '|O^'              //returns --> { state: { testKey: null } }
-//var extendMe = '|O*8'             //returns --> { state: [ {}, {}, {} ] }
-//var extendMe = '|O*3hour,day,week^' //returns --> { state: [ { hour: null }, { day: null }, { week: null }, { year: null } ] }
-var extendMe = '|O*3Sname,Nphone,BisCool,BhasCar,BisScrub,ZisDatable^' 
-//returns --> result { state: [ { name: 'string' }, { phone: 'number' }, { isCool: 'boolean' }, { hasCar: 'boolean' }, { isScrub: 'boolean' }, { isDatable: null } ] }
+//var extendMe = '|O*3'             //returns --> { state: [ {}, {}, {} ] }
+//var extendMe = '|O*3Shour,Sday,Sweek^' //returns --> { state: [ { hour: null }, { day: null }, { week: null }, { year: null } ] }
+
+//Need to modify. If num removed from string[3] empty obj gets pushed to front of array.
+//var extendMe = '|O*2Sname,Nphone,Saddress,BhasEmail,BisDeveloper^' 
+//returns --> result { state: [ { name: 'string' }, { phone: 'number' }, { address: 'string' }, { hasEmail: 'boolean'' }, { isDeveloper: 'boolean' } ] }
+
+
 
 //pipe tells editor to listen for array or object to be created, declared immediately after by 'A' and 'O' respectively
 //caret indicates end of current sequence, and to listen for next sequence that may be on same level or can be nested deeper
@@ -25,8 +30,7 @@ function InputStream(input) {
         next: next,
         peek: peek,
         skipTwo: skipTwo,
-        three: three,
-        eof: eof
+        three: three
     };
     function peek() {
         let ch = input.charAt(pos)
@@ -43,9 +47,6 @@ function InputStream(input) {
     function three() {
         var ch = input.charAt(pos+3);
         return ch
-    }
-    function eof() {
-        return 'start new word';
     }
 }
 //stream indicates which part of the sequence comes next and gives direction to code to organize data
@@ -111,7 +112,15 @@ function tokenStream(input) {
             } 
             if (strTrue === true) {
                 return getString()
-            }   
+            }
+            if(typeof input.skipTwo() === 'number') {
+                console.log(input.skipTwo())
+                result.state.length = Number.parseInt(input.three())
+                for(let i = 0; i < result.state.length; i++) {
+                    let random = (Math.floor(Math.random() * wordsLength))
+                     if(result.state[i] === []) result.state[i].push = words[random]
+                 }
+            }
             return
         }
         if (input.next() === "O") {
@@ -160,8 +169,11 @@ function tokenStream(input) {
         if (ch === "|") {
             return isPipe()
         }
-        if (ch === '>') console.log('greater than')
-        return read_next()
+        //to update to nest further. Modify functions to look for '>', 
+        //if found new value should be nested to next level (in array 
+        //or obj rather than iterating through result)
+        // if (ch === '>') console.log('greater than')
+        // return read_next()
     }
     console.log(result)
 }
