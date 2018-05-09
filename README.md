@@ -1,19 +1,39 @@
-# LSP Multi Root Example
+# ReactEd
 
-A language server example that demonstrates how to handle configuration settings in a workspace that uses multi root folders. Since settings in VS Code in this setup are typically scoped to a resource, the example reads the resource settings from the client using the new proposed API getConfiguration. This is analogous to reading settings in a multi-root folder setup directly in the extension host.
+Exposing the props passed down from the react parent components.
 
-The example uses proposed Language Server protocol. So the code demoed here might change when the final version of the configuration and workspace folder protocol is released.
+## Features
 
-## Compile and Run
+* When you hover over the component name you will see what props are being passed or if they just are being sent from the next level up.
+* React/Redux Snippets for ease of development
 
-- run `npm install` in this folder. This installs all necessary npm modules in both the client and server folder
-- open VS Code on this folder.
-- Press Ctrl+Shift+B to compile the client and server
-- Switch to the Debug viewlet
-- Select `Launch Client` from the drop down
-- Run the lauch config
-- If you want to debug the server as well use the launch configuration `Attach to Server`
+## Usages
 
-- In the [Extension Development Host] instance of VSCode, open a document in 'plain text' language mode.
-  Enter text content such as `AAA aaa BBB`. The extension will emit diagnostics for all words in all-uppercase.
+![Usage](images/usage.gif)
 
+## Configuration
+
+ReactEd requires a webpack generated bundle file to properly traverse your application.  At this time we are unable to offer support for Create-React-App.  
+```javascript
+{
+  module.exports = {
+    entry: './src/index.js',
+    output: {
+      path: path.resolve(__dirname, 'dist/'),
+      filename: 'bundle.js',
+      publicPath: '/dist',
+    },
+    mode: 'none',
+  }
+}
+```
+**Note:** If using Webpack 4.0 or greater please change your [**mode**](https://webpack.js.org/concepts/#mode) to **none** as the default is **Production** which will minify the bundle and make our tool stop working.
+
+## Change Log
+See Change Log [here](CHANGELOG.md)
+
+## Issues
+Submit the [issues](https://github.com/ReactEdLLC/ReactEd/issues) if you find any bug or have any suggestion.
+
+## Contribution
+Fork the [repo](https://github.com/ReactEdLLC/ReactEd) and submit pull requests.

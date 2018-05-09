@@ -1,13 +1,16 @@
 {
-	"name": "lsp-mulit-root-sample",
-	"description": "A language server example demoing multi root workspaces",
-	"author": "Microsoft Corporation",
+	"name": "reacted",
+	"description": "Tools to enhance react development",
+	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
 	"license": "MIT",
 	"version": "0.0.1",
 	"publisher": "vscode",
+	"engines": {
+		"vscode": "^1.1.5"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/ReactEdLLC/ReactEd"
 	},
 	"scripts": {
 		"postinstall": "cd server && npm install && cd ../client && npm install && cd ..",

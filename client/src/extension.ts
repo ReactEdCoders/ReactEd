@@ -1,24 +1,14 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 'use strict';
-
 import * as path from 'path';
 import * as fs from 'fs';
+import traverseWebpack from './traverseWebpack';
 import { window, workspace, ExtensionContext, WorkspaceConfiguration, Disposable } from 'vscode';
 import { 
-	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware, 
-	DidChangeConfigurationNotification, Proposed, ProposedFeatures
+	LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, CancellationToken, Middleware,
+	DidChangeConfigurationNotification, ConfigurationParams
 } from 'vscode-languageclient';
-const qfgets = require('qfgets');
-// const qfgets = require('qfgets');
-
-// import { POINT_CONVERSION_COMPRESSED } from 'constants';
-
-// The example settings
-interface MultiRootExampleSettings {
-	maxNumberOfProblems: number;
+interface ReactEdSettings {
+	maxNumberOfProblems: number; 
 }
 
 let client: LanguageClient;
@@ -26,14 +16,13 @@ let client: LanguageClient;
 namespace Configuration {
 
 	let configurationListener: Disposable;
-
 	// Convert VS Code specific settings to a format acceptable by the server. Since
 	// both client and server do use JSON the conversion is trivial. 
-	export function computeConfiguration(params: Proposed.ConfigurationParams, _token: CancellationToken, _next: Function): any[] {
+	export function computeConfiguration(params: ConfigurationParams, _token: CancellationToken, _next: Function): any[] {
 		if (!params.items) {
 			return null;
 		}
-		let result: (MultiRootExampleSettings | null)[] = [];
+		let result: (ReactEdSettings | null)[] = [];
 		for (let item of params.items) {
 			// The server asks the client for configuration settings without a section
 			// If a section is present we return null to indicate that the configuration
@@ -44,9 +33,9 @@ namespace Configuration {
 			}
 			let config: WorkspaceConfiguration;
 			if (item.scopeUri) {
-				config = workspace.getConfiguration('lspMultiRootSample', client.protocol2CodeConverter.asUri(item.scopeUri));
+				config = workspace.getConfiguration('reacted', client.protocol2CodeConverter.asUri(item.scopeUri));
 			} else {
-				config = workspace.getConfiguration('lspMultiRootSample');
+				config = workspace.getConfiguration('reacted');
 			}
 			result.push({
 				maxNumberOfProblems: config.get('maxNumberOfProblems')
@@ -60,20 +49,16 @@ namespace Configuration {
 		// listen to any change. However this will change in the near future.
 		configurationListener = workspace.onDidChangeConfiguration(() => {
 			client.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
-		});
-		
+		});	
 	}
-
 	export function dispose() {
 		if (configurationListener) {
 			configurationListener.dispose();
 		}
 	}
 }
-
-
-
 export function activate(context: ExtensionContext) {
+	window.showInformationMessage('Started ReactEd');
 	function pathExists(p: string): boolean {
 		try {
 			fs.accessSync(p);
@@ -82,109 +67,41 @@ export function activate(context: ExtensionContext) {
 		}
 		return true;
 	}
-
-	const grepWithMe = (line: string, regex: RegExp) => {
-		let result: string;
-		let temp: string;
-		if (regex.exec(line)) {
-			temp = regex.exec(line)[0];
-			result = temp.replace('_', '').replace('2', '').replace('(', '').replace('.default', '');
-		}
-		return result;
-	  }
-
-	function grepWithFs( filename: string, regexp1: string, regexp2: RegExp, regexp3: RegExp, regexp4: RegExp ) {
-		let fp = new qfgets(filename);
-		let contObj: any;
-		contObj = {};
-		let currentClass: string = '';
-		function loop() {
-			for (let i=0; i<40; i++) {
-
-				let line = fp.fgets();
-				if (line.match(regexp1)) { // Get Root Item
-					// let rootClean: string;
-					// rootClean = grepWithMe(line, /_[A-Z][A-Za-z]*2\.default|[A-Z][A-Za-z]*\.default/);
-					// contObj[rootClean] = 'Root';
-					currentClass = '';
-				} else if (regexp2.exec(line)) { // Get Class
-					let cleanClass = grepWithMe(line, /(?!_createClass)+\([A-Z][A-Za-z]*/);
-					if (!contObj[cleanClass]) {
-					contObj[cleanClass] = {props: [], parent: null};
-					}
-					currentClass = cleanClass;
-                } else if (regexp3.exec(line)) { //  Dumb Components
-				let dumbComp = grepWithMe(line, /[A-Z][A-Za-z]*/);
-				if (!contObj[dumbComp]) {
-					contObj[dumbComp] = {props: [], parent: null};
-					}
-					currentClass = dumbComp;
-				} else if (regexp4.exec(line)) { // Component Creation with Props
-					let elementItem = grepWithMe(line, /(?!_react2.default.createElement)\(_[A-Z][A-Za-z]*/);
-					let elementProps = grepWithMe(line, /\{.+\}/);
-					if (!elementProps) {
-						elementProps = "null";
-					}
-					if (!contObj[elementItem]) {
-						contObj[elementItem] = {props: [], parent: null};
-					}
-					if (currentClass !== '') {
-						contObj[elementItem].parent = currentClass;
-					}
-					elementProps = elementProps.replace('{','').replace('}','').replace(' ', '');
-					let propArr = elementProps.split(/,|:/g);
-					let initObj: any = {};
-					for (let i = 0; i < propArr.length - 1; i += 2) {
-						initObj[propArr[i].trim()] = propArr[i+1].trim();
-					}
-					contObj[elementItem].props = initObj;
-        }
-			}
-		
-			if (!fp.feof()) setImmediate(loop);
-			fs.writeFile(__dirname + '/../../../server/src/componentTree.json', JSON.stringify(contObj), (err: any) => {
-				if (err) console.log(err);
-			});
-		}
-		loop();
-	}
-
-	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js');
-	window.showInformationMessage(WebpackPath);
+	/**** Parsing through the webpack config file for bundle location ****/  
+	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js'); // Accessing the webpack file
   	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
-	const filepathReg = /.*path:.*'|.*path:.*"/g;
-	const filenameReg = /.*filename:.*'|.*filename:.*"/g;
-
-	let filepathLine = content.match(filepathReg);
-	let filenameLine = content.match(filenameReg);
-
+	const filepathReg = /.*path:.*'|.*path:.*"/g; //Regex for the file path
+	const filenameReg = /.*filename:.*'|.*filename:.*"/g; // Regex for the file name
+	let filepathLine = content.match(filepathReg); // looking for the file path
+	let filenameLine = content.match(filenameReg); //looking for the file name
 	let filesReg = /'.*'|".*"/g;
-
 	let filepath = filepathLine[0].match(filesReg);
 	let filename = filenameLine[0].match(filesReg);
-
 	let bundle = path.join(workspace.rootPath, filepath[0].slice(1, filepath[0].length-1), filename[0].slice(1, filename[0].length-1));
-
+	/****if found bundle then traversing the bundle file ****/
 	if (pathExists(bundle)) {
-
-	window.showInformationMessage(bundle);
-
-	let classReg = /_createClass\([A-Z][A-Za-z]*/;
-		let propsReg = /var.[A-Z][A-Za-z]*.=.function.[A-Z][A-Za-z]*\(props\).{/;
-		let compReg = /_react2.default.createElement\(_[A-Z][A-Za-z]*/;
-	
-		grepWithFs(bundle, '_reactDom.render', classReg, propsReg, compReg);
-	
+		window.showInformationMessage('Bundle Found..Starting Parse');
+		let traverse = new traverseWebpack(); //Bringing in functionality for parsing the bundle file 
+		traverse.grepWithFs(bundle);
+		let debounce = false; 
+			fs.watch(bundle, { encoding: 'buffer' }, (event, filename) => {
+				if(event === 'change' && !debounce && filename) {
+					debounce = true;
+					setTimeout(() => {
+						debounce = false;
+					}, 5000)
+					traverse.grepWithFs(bundle);
+				}
+			});	
 	} else {
-		window.showInformationMessage('Workspace has no Webpack');
+		window.showInformationMessage('Unable to find webpack bundle');
 	  }
-	
 	}
 	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
 	// The debug options for the server
-	let debugOptions = { execArgv: ["--debug=5859"] };
+	let debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 	
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -192,40 +109,27 @@ export function activate(context: ExtensionContext) {
 		run : { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
-
-	let middleware: ProposedFeatures.ConfigurationMiddleware | Middleware = {
+	let middleware: Middleware = {
 		workspace: {
 			configuration: Configuration.computeConfiguration
 		}
 	};
-
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
+		// Register the server for javascript and JSX files
 		documentSelector: [{scheme: 'file', language: 'javascript'},{scheme: 'file', language: 'javascriptreact'}],
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contain in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/.clientrc'),
-			// In the past this told the client to actively synchronize settings. Since the
-			// client now supports 'getConfiguration' requests this active synchronization is not
-			// necessary anymore. 
-			// configurationSection: [ 'lspMultiRootSample' ]
+			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		},
-		middleware: middleware as Middleware
+		middleware: middleware
 	}
-	
 	// Create the language client and start the client.
 	client = new LanguageClient('languageServerExample', 'Language Server Example', serverOptions, clientOptions);
-	// Register new proposed protocol if available.
-	client.registerProposedFeatures();
-	client.onReady().then(() => {
-		Configuration.initialize();
-	});
 	
 	// Start the client. This will also launch the server
 	client.start();
 }
-
 export function deactivate(): Thenable<void> {
 	if (!client) {
 		return undefined;
