@@ -1,73 +1,73 @@
 {
-	"name": "reacted",
-	"description": "An extension to assist with development of react and redux applications.",
-	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
-	"icon": "images/logo.png",
-	"license": "MIT",
-	"displayName": "ReactEd",
-	"version": "0.0.1",
-	"publisher": "ReactEd",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/ReactEdLLC/ReactEd"
-	},
-	"engines": {
-		"vscode": "^1.20.0"
-	},
-	"categories": [
-		"Other",
-		"Snippets"
-	],
-	"activationEvents": [
-		"onLanguage:javascriptreact",
-		"onLanguage:javascript"
-	],
-	"main": "./out/src/extension",
-	"contributes": {
-		"configuration": {
-			"type": "object",
-			"title": "Server configuration",
-			"properties": {
-				"reacted.maxNumberOfProblems": {
-					"scope": "resource",
-					"type": "number",
-					"default": 100,
-					"description": "Controls the maximum number of problems produced by the server."
-				},
-				"reacted.trace.server": {
-					"scope": "window",
-					"type": "string",
-					"enum": [
-						"off",
-						"messages",
-						"verbose"
-					],
-					"default": "off",
-					"description": "Traces the communication between VSCode and the language server."
-				}
-			}
-		},
-		"snippets": [
-			{
-				"language": "javascriptreact",
-				"path": "./snippets/snippets.json"
-			},
-			{
-				"language": "javascript",
-				"path": "./snippets/snippets.json"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "tsc -p ./",
-		"compile": "tsc -p ./",
-		"watch": "tsc -w -p ./",
-		"update-vscode": "node ./node_modules/vscode/bin/install",
-		"postinstall": "node ./node_modules/vscode/bin/install"
-	},
-	"dependencies": {
-		"vscode": "^1.1.17",
-		"vscode-languageclient": "^4.1.3",
-		"qfgets": "^1.1.1"
-	}
+    "name": "reacted",
+    "description": "An extension to assist with development of react and redux applications.",
+    "author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
+    "icon": "images/logo.png",
+    "license": "MIT",
+    "displayName": "ReactEd",
+    "version": "0.0.2",
+    "publisher": "ReactEd",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ReactEdLLC/ReactEd"
+    },
+    "engines": {
+        "vscode": "^1.20.0"
+    },
+    "categories": [
+        "Other",
+        "Snippets"
+    ],
+    "activationEvents": [
+        "onLanguage:javascriptreact",
+        "onLanguage:javascript"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Server configuration",
+            "properties": {
+                "reacted.maxNumberOfProblems": {
+                    "scope": "resource",
+                    "type": "number",
+                    "default": 100,
+                    "description": "Controls the maximum number of problems produced by the server."
+                },
+                "reacted.trace.server": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VSCode and the language server."
+                }
+            }
+        },
+        "snippets": [
+            {
+                "language": "javascriptreact",
+                "path": "./snippets/snippets.json"
+            },
+            {
+                "language": "javascript",
+                "path": "./snippets/snippets.json"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -p ./",
+        "watch": "tsc -w -p ./",
+        "update-vscode": "node ./node_modules/vscode/bin/install",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "dependencies": {
+        "vscode": "^1.1.17",
+        "vscode-languageclient": "^4.1.3",
+        "qfgets": "^1.1.1"
+    }
 }
