@@ -5,7 +5,7 @@
     "icon": "images/logo.png",
     "license": "MIT",
     "displayName": "ReactEd",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "ReactEd",
     "repository": {
         "type": "git",
