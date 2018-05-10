@@ -11,6 +11,11 @@
 			"body": "class ${1:componentName} extends Component {\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
 			"description": "creates only the class component" 
 		}, 
+		"Import Style" : {
+			"prefix": "istyles", 
+			"body": "const styles = StyleSheet.create({\n\t\n\t\n\t});",
+			"description" : "defines your styles"
+	},
 		"Class with will mount": {
 			"prefix": "cwmount",
 			"body": "class ${1:componentName} extends Component {\n\n\tcomponentWillMount () {\n\n\t}\n\n\n\trender () {\n\t\treturn (\n\t\t\t<div>\n\t\t\t\t$0\n\t\t\t</div>\n\t\t)\n\t}\n}\n",
