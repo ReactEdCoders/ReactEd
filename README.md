@@ -17,6 +17,28 @@ An extension to assist with development of react and redux applications.
 ![Usage](images/usage.gif)
 
 ### Snippets
+#### ccon
+![ccon](images/ccon.gif)
+#### cdmount
+![cdmount](images/cdmount.gif)
+#### cocomp
+![cocomp](images/cocomp.gif)
+#### cwmount
+![cwmount](images/cwmount.gif)
+#### impf
+![impf](images/impf.gif)
+#### ireact
+![ireact](images/ireact.gif)
+#### ired
+![ired](images/ired.gif)
+#### reducer
+![reducer](images/reducer.gif)
+#### rstore
+![rstore](images/rstore.gif)
+#### scribe
+![scribe](images/scribe.gif)
+#### tsps
+![tsp](images/tsp.gif)
 
 ## Configuration
 
