@@ -69,7 +69,8 @@ export function activate(context: ExtensionContext) {
 	}
 	/**** Parsing through the webpack config file for bundle location ****/  
 	const WebpackPath = path.join(workspace.rootPath, 'webpack.config.js'); // Accessing the webpack file
-  	if (pathExists(WebpackPath)) {
+	window.showInformationMessage(WebpackPath);	
+	if (pathExists(WebpackPath)) {
 	let content = fs.readFileSync(WebpackPath, 'utf-8');
 	const filepathReg = /.*path:.*'|.*path:.*"/g; //Regex for the file path
 	const filenameReg = /.*filename:.*'|.*filename:.*"/g; // Regex for the file name

@@ -147,7 +147,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   //parses through component tree file to create component/props obj & component array
 
   let content = fs.readFileSync(
-    __dirname + "/../out/src/componentTree.json"
+    __dirname + "/componentTree.json"
   );
   let tree = JSON.parse(content.toString());
 

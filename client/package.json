@@ -1,20 +1,22 @@
 {
 	"name": "reacted",
-	"description": "Tools to enhance react development",
+	"description": "An extension to assist with development of react and redux applications.",
 	"author": "Madalyn Baehre, Ben Gummelt, Jake Acosta, Robert P Gonzalez",
+	"icon": "images/logo.png",
 	"license": "MIT",
 	"displayName": "ReactEd",
 	"version": "0.0.1",
-	"publisher": "vscode",
+	"publisher": "ReactEd",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ReactEdLLC/ReactEd"
 	},
 	"engines": {
-		"vscode": "^1.23.0"
+		"vscode": "^1.20.0"
 	},
 	"categories": [
-		"Other"
+		"Other",
+		"Snippets"
 	],
 	"activationEvents": [
 		"onLanguage:javascriptreact",
@@ -48,6 +50,10 @@
 		"snippets": [
 			{
 				"language": "javascriptreact",
+				"path": "./snippets/snippets.json"
+			},
+			{
+				"language": "javascript",
 				"path": "./snippets/snippets.json"
 			}
 		]
